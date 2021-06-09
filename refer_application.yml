@@ -1,0 +1,22 @@
+spring:
+  datasource:
+
+    url: jdbc:tibero:thin:@192:168:179:231:8629:tibero
+    #url: jdbc:h2:tcp://localhost/~/jpashop
+    username: sys #sa
+    password: tibero # none
+    driver-class-name: com.tmax.tibero.jdbc.TbDriver #org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none #create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle9iDialect #추가함
+        show_sql: true
+      format_sql: true
+    #database-platform: org.hibernate.dialect.Oracle9iDialect
+
+
+logging.level:
+  org.hibernate.SQL: debug
+  #org.hibernate.type: trace
