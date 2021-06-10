@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -9,10 +10,12 @@ import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class MemberRepository {
 
-    @PersistenceContext
-    private EntityManager em; //스프링이 엔티티매니저 다 꺼내고 해줌.
+    //@PersistenceContext //엔티티매니저용 인젝션.. 근데 스프링부트가 @Autowired도 지원해줌
+    private final EntityManager em; //스프링이 엔티티매니저 다 꺼내고 해줌.
+    //생성자로 인젝션 한 것!
 
     public void save(Member member) {
         em.persist(member); //멤버객체 넣음, 커밋시점에 디비에 반영됨
