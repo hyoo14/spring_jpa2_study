@@ -1,5 +1,8 @@
 package jpabook.jpashop.domain;
-import lombok.Getter;import lombok.Setter;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Table(name = "orders")
 @Getter @Setter
+@NoArgsConstructor(access= AccessLevel.PROTECTED) //누가 바보같이 오더 생성해도 빨간불 뜨게 만들어줌
 public class Order {
     @Id @GeneratedValue
     @Column(name = "order_id")
@@ -19,13 +23,14 @@ public class Order {
     @JoinColumn(name = "member_id")
     private Member member; //주문 회원
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL) //원래는 오더 저장하고 쭉쭉 저장해야하는데
+    //23강서 설명 추가: 오더 퍼시스트하면 오더아이템도 다 강제로 퍼시스트 날려줌-캐스캐이드 걸려서
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL) //원래는 오더 저장하고 쭉쭉 저장해야하는데 //캐스케이드 올
     private List<OrderItem> orderItems = new ArrayList<>();
 
     //오더 아이템A,B,C jpa persist 해줘야하는데, 그담 poersisit(orrder) 이런 식
     //persist cascade가 전파해줌, 딜리트할 때 다 지워줌
 
-
+    //23강서 설명 추가: 딜리버리도 다 강제로 퍼시스트 날려줌-캐스캐이드 걸려서
     @OneToOne(cascade = CascadeType.ALL, fetch = LAZY)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery; //배송정보
