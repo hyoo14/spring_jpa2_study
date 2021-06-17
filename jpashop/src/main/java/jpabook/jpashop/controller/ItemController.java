@@ -68,17 +68,25 @@ public class ItemController {
     }
 
     @PostMapping("items/{itemId}/edit")
-    public String updateItem(@PathVariable String itemId, @ModelAttribute("form") BookForm form){
+    public String updateItem(@PathVariable Long itemId, @ModelAttribute("form") BookForm form){
 
-        Book book = new Book();
-        book.setId(form.getId()  );
-        book.setName(form.getName()   );
-        book.setPrice(form.getPrice()   );
-        book.setStockQuantity(form.getStockQuantity());
-        book.setAuthor(form.getAuthor()  );
-        book.setIsbn(form.getIsbn()   );
-        //권한 체크해주는 로직 나중에 있어야. 세션에 넣을 수도 있으나 요즘 세션객체 잘 안써서..
-        itemService.saveItem(book);
+//        Book book = new Book();
+//        book.setId(form.getId()  );
+//        book.setName(form.getName()   );
+//        book.setPrice(form.getPrice()   );
+//        //만약에 프라이스 안 바뀌게 여기서 주석처리하면 디비에서는 null로 merge가 갈아치기 해버림.
+//        //원래 가격이 만원이었다면 null이 되어버리는 것.
+//
+//        book.setStockQuantity(form.getStockQuantity());
+//        book.setAuthor(form.getAuthor()  );
+//        book.setIsbn(form.getIsbn()   );
+//        //db갔다온 게 있으면 준영속상태. 식별자가 존재.
+//
+//        //권한 체크해주는 로직 나중에 있어야. 세션에 넣을 수도 있으나 요즘 세션객체 잘 안써서..
+//        itemService.saveItem(book);
+        //->아래처럼 하는 것이 훨씬 깔끔. 어설프게 엔티티를 파라미터로 안 씀!
+        itemService.updateItem(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
+
         return "redirect:/items";
 
     }

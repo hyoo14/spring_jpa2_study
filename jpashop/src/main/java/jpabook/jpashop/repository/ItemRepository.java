@@ -18,6 +18,8 @@ public class ItemRepository {
             em.persist(item);
         } else{
             em.merge(item); //merge의 정체?! ->실무에서 쓸 일이 거의 없다
+            //머지는 updateItem 한땀 한땀 짠 코드를 jpa가 한번에 해주는 것.
+            //파라미터로 넘어온 item은 영속성으로 바뀌진 않음.
         }
     }
 
