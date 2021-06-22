@@ -1,4 +1,5 @@
 package jpabook.jpashop.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +30,7 @@ public class Member {
     @Embedded
     private Address address;
 
+    //@JsonIgnore //jpa2 주석: 안 보이게 할 수도 있음 //하지만 다른 api만들 때 멘붕이 옵니다..
     @OneToMany(mappedBy = "member") //주인이 아님. mappedBy
     private List<Order> orders = new ArrayList<>(); //이 컬렉션을 가급적이면 밖으러 꺼내지도 말고 변경하지 말아야.
     //있는 거 그대로 써야 안전합니다. 하이버네이트가 관리하기 때문에 바꾸면 동작 제대로 안 할 수 있습니다.
