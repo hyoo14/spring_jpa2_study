@@ -2,13 +2,11 @@ package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -36,6 +34,30 @@ public class MemberApiController {
         Long id = memberService.join(member);
         return new CreateMemberResponse(id);
     }
+
+    @PutMapping("/api/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2
+            (@PathVariable("id") Long id,
+             @RequestBody @Valid UpdateMemberRequest request){
+
+        memberService.update(id, request.getName());
+        Member findMember = memberService.findOne(id); //스타일이긴 한데 단순하게 pk찍어서 쿼리 날림
+        //커맨드와 쿼리 분리해서 유지보수하는 방법
+
+        return new UpdateMemberResponse(findMember.getId(), findMember.getName());
+
+    }
+    @Data
+    static class UpdateMemberRequest {
+        private String name;
+    }
+    @Data
+    @AllArgsConstructor //dto는 대충 data 왔다갔다니까 롬복 어노테이션 많이 씀. 실용적 관점에서
+    static class UpdateMemberResponse{
+        private Long id;
+        private String name;
+    }
+
 
     @Data
     static class CreateMemberRequest{
