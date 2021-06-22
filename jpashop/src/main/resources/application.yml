@@ -7,7 +7,7 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: none #create jpa2 회원조회api에서 바꿔줌
+      ddl-auto: create #none #create jpa2 회원조회api에서 바꿔줌
     properties:
       hibernate:
         #show_sql: true
