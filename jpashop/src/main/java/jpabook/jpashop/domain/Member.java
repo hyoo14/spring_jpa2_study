@@ -5,6 +5,7 @@ import lombok.Setter;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
@@ -15,7 +16,15 @@ public class Member {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-    private String name;
+
+    @NotEmpty //제약조건 주기 //java validation 검증.
+    // ->문제가 있음. 화면에서 나오는(프레젠테이션) 검증로직이 엔티티에 들어감
+    private String name; //만약에 username으로 바꾼다면, api스펙 자체가 username으로 바뀌어버림. 이것이 큰 문제
+    //엔티티 바뀔 확률이 높은데 이거 바꾸었다고 api스펙이 바뀌는 것이 문제!!
+    //결론적으로 api스펙을 위한 별도의 dto를 만들어야 합니다! 바로 바인딩해서 이렇게 쓰면 나중에 큰일납니다. 많은 서비스 장애 발생.
+    //api 스펙에 맞게 별도의 dto를 받으시는 것이 좋습니다!
+    //같은 가입이어도 여러 케이스에 대한 여러가지 api가 만들어질 가능성이 높음 ->엔티티 바뀔 일은 매우 많다!
+    //api를 만들 때는 항상 엔티티를 파라미터로 받지 마시오. 엔티티를 웹에 노출해도 안돼!
 
     @Embedded
     private Address address;
