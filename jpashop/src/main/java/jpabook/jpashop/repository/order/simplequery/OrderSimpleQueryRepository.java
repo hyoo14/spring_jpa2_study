@@ -25,4 +25,5 @@ public class OrderSimpleQueryRepository {
 
     //이렇게 분리해놓으면 유지보수가 좋음.
     //기존 리포지토리는 엔티티 접근용으로 놔둠.
+    //최후의 방법으로 네이티브 sql이나 spring jdbc template을 사용할 경우 여기서 작성하면 됨.
 }
