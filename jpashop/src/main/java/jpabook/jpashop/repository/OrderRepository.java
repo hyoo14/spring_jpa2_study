@@ -92,4 +92,12 @@ public class OrderRepository {
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
         return query.getResultList();
     }
+
+    public List<Order> findAllWithMemberDelivery() { //한방 쿼리로 멤버 오더 딜리버리 조인한 다음 아예 셀렉 절에 다 넣고 한방에 다 땡겨옴
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" + //패치는 jpa만 있는 문법. sql에는 없음 //jpa 기본편 참고
+                        " join fetch o.delivery d", Order.class //패치 조인은 실무에서 정말 자주 사용. 책이나 강좌로 100퍼 이해해야함!
+        ).getResultList();
+    }
 }

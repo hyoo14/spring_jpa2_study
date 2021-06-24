@@ -23,7 +23,9 @@ public class MemberApiController {
 
     @GetMapping("/api/v1/members")
     public List<Member> memberV1(){
+
         return memberService.findMembers(); //entity 정보 다 노출됨.
+
     }
 
     @GetMapping("/api/v2/members")
@@ -32,16 +34,19 @@ public class MemberApiController {
         List<MemberDto> collect = findMembers.stream()
                 .map(m -> new MemberDto(m.getName()))
                 .collect(Collectors.toList());
-        return new Result(collect.size(), collect); //엔티티 디티오로 변환해주는 수고로움이 있지만 스펙이 변하지 않는 장점이 있다.
+        return new Result(collect.size(), collect);
+        //엔티티 디티오로 변환해주는 수고로움이 있지만 스펙이 변하지 않는 장점이 있다.
         //감싸서 변환하기 때문에 유연성도 생긴다.
     }
 
     @Data
     @AllArgsConstructor
-    static class Result<T>{ //generic이니까 T?? ->object type으로 변환해주는.. 감싸주는것. 유연성을 높여줌.
-        //배열만으로 나오면 유연성이 떨어지니깐..
+    static class Result<T>{
         private int count;
-        private T data; //t type data
+        private T data;
+        //t type data
+        //generic이니까 T?? ->object type으로 변환해주는.. 감싸주는것. 유연성을 높여줌.
+        //배열만으로 나오면 유연성이 떨어지니깐..
     }
     @Data
     @AllArgsConstructor
