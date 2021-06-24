@@ -1,5 +1,7 @@
 package jpabook.jpashop.repository;
 
+//import jpabook.jpashop.api.OrderSimpleApiController; //리포지토리에서 컨트롤러에 의존관계 생기면 큰일납니다. //망하자는 거(강조하심)
+//의존관계는 안으로 들어오거나 헥사고널 아키텍처처럼 다 인터페이스로 발라내거나 이런 거 아닌 이상 한방향으로 흘러가야함(컨트롤러에서 리포지토리 가는 거 정도)
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
@@ -100,4 +102,18 @@ public class OrderRepository {
                         " join fetch o.delivery d", Order.class //패치 조인은 실무에서 정말 자주 사용. 책이나 강좌로 100퍼 이해해야함!
         ).getResultList();
     }
+
+//    public List<OrderSimpleQueryDto> findOrderDtos() {
+//        return em.createQuery( "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) from Order o" +
+//                                    " join o.member m" +
+//                                    " join o.delivery d", OrderSimpleQueryDto.class) //o가 dto에 매핑될 수 없음
+//                        .getResultList();
+//        //jpa는 엔티티나 벨류 오브젝트가 기본적으로 반환할 수 있음. dto같은 거 안됨
+//        //new 오퍼레이션 꼭 서야함. 좀 지져분해짐
+//
+//    } ->order.simplequery에 OrderSimpleQueryRepository 만들어서 옮김.
+
+    //리포지토리는 순수한 엔티티를 조회하는 데에 써야함!
+
+
 }

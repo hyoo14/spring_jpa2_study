@@ -5,9 +5,10 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     @GetMapping("/api/v1/simple-orders")
     public List<Order> ordersV1(){
@@ -51,7 +53,7 @@ public class OrderSimpleApiController {
         return result;
     }
 
-    @GetMapping("/api/v3/simple-orders")
+    @GetMapping("/api/v3/simple-orders") //패치조인 사용하여 쿼리 한번만 날리는 최적화!
     public List<SimpleOrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithMemberDelivery();
         List<SimpleOrderDto> result = orders.stream()
@@ -60,7 +62,17 @@ public class OrderSimpleApiController {
         return result;
     }
 
-        @Data
+    @GetMapping("/api/v4/simple-orders") //엔티티 거치지 않고 바로dto로만 하는 최적화!
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos(); //디비에서 데이터를 덜 퍼울림. 그것이 장점
+        //하지만 v3, v4는 우열 가리기 힘듬. tradeoff있음.
+        //v3는 내부에 원하는 것만 패치조인으로 가져와서 성능 튜닝
+        //v4는 sql 짜듯이 jpql짜서 가져와버림. 재사용성이 떨어짐. 특정 dto 쓸 때만 쓸 수 있음.
+        //v3는 많은 api에서 활용 가능.
+        //v4는 성능이 좀 더 나음. 단 dto로 조회한 거는 변경을 할 수가 없음. 엔티티가 아니니깐 jpa로 할 수 있는 것이 없움. 코드도 좀 더 지저분.
+    }
+
+    @Data
     static class SimpleOrderDto{
         private Long orderId;
         private String name;
