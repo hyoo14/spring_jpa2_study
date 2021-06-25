@@ -13,6 +13,7 @@ spring:
         #show_sql: true
       format_sql: true
       default_batch_fetch_size: 100 #필살기? #인쿼리의 개수 몇개로 할 것인가.
+    #open-in-view: false #osiv부분
 
 logging.level:
   org.hibernate.SQL: debug

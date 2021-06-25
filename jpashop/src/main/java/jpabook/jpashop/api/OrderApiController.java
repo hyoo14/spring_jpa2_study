@@ -66,7 +66,7 @@ public class OrderApiController {
 
         List<OrderDto> result = orders.stream()
                 .map(o -> new OrderDto(o)) //변환
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); //jpa2 osiv false일 경우, 이런 변환로직 자체를 OrderQueryService 같은 곳으로(트렌섹셔널) 옮겨서 다 처리해줌
         return result;
 
     }
@@ -153,7 +153,14 @@ public class OrderApiController {
         }//
 
 
+        //osiv true(기본값) 되어 있으면 최종(화면이 렌더링되거나 api 값 반환)상태 까지 영속 상태가 유지됨
+        //근데 계속 커넥션 들고 있어서 리소스 많이 잡아먹는 문제가 되기도 함.(단점)
+        //장점은 엔티티 적극 활용해서 레이지로딩 기술 엔티티나 뷰에 적극 사용할 수 있음, 개발입장에서 중복 줄이고 투명하게 끝까지 나갈 수 있음
 
+        //osiv 끄면 트랜잭션 범위에서만 영속상태가 됨..
+        //이 경우 OrderQueryService 처럼 트랙잭셔널에 넣어서 처리
+
+        //성능 생각하면 꺼야하지만 유지보수는 열어야. 고객서비스의 실시간 api는 osiv 끄고 admin처럼 커넥션 많이 사용하지 않는 곳에서는 osiv 키는 것이 좋음
 
     }
 }
