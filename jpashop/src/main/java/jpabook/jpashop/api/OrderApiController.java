@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
+import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepositiory;
 import lombok.Getter;
@@ -91,6 +93,21 @@ public class OrderApiController {
     @GetMapping("/api/v5/orders") //패치조인으로 최적화
     public List<OrderQueryDto> orderV5(){
         return orderQueryRepositiory.findAllByDto_optimization();
+    }
+
+    @GetMapping("/api/v6/orders") //패치조인으로 최적화
+//    public List<OrderFlatDto> orderV6(){ //기존 한방 쿼리 작성
+//        return orderQueryRepositiory.findAllByDto_flat();
+//    }
+    public List<OrderQueryDto> orderV6(){ //노가다로 v5처럼 스펙 바꾼 경우(중복 없앤 경우) //개발자가 직접 분해 조립해서 넣은..맞출수는 있음을 보여준.............
+        List<OrderFlatDto> flats = orderQueryRepositiory.findAllByDto_flat();
+
+        return flats.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
     }
 
 
