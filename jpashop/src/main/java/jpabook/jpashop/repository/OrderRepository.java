@@ -103,6 +103,8 @@ public class OrderRepository {
         ).getResultList();
     }
 
+
+
 //    public List<OrderSimpleQueryDto> findOrderDtos() {
 //        return em.createQuery( "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) from Order o" +
 //                                    " join o.member m" +
@@ -114,6 +116,18 @@ public class OrderRepository {
 //    } ->order.simplequery에 OrderSimpleQueryRepository 만들어서 옮김.
 
     //리포지토리는 순수한 엔티티를 조회하는 데에 써야함!
+    public List<Order> findAllWithItem() {
+    return em.createQuery( //실무에서는 문자 공백 오타 걱정없이 쿼리디에스엘로 짜면 됩니다!
+                "select distinct o from Order o" + //"select o from Order o"
+                        " join fetch o.member m" + //이렇게 하니 컬럼 뻥튀기되서 넘 많아짐 그래서 대안으로 위에서 distinct 사용
+                        // 하지만 dbquery상은 똑같음.. jpa에서 중복 버려준 것! 컬렉션 담을 때! (distinct는 2가지 기능 한 것. 쿼리에도 넣어주고, 어플차원서 중복도 제거해주고)
+                        " join fetch o.delivery d" +
+                        " join fetch o.orderItems oi" +
+                        " join fetch oi.item i", Order.class)
+            .setFirstResult(1) //페이징예시
+            .setMaxResults(100) //페이징예시 //지금 방법은 페이징이 안 되는 단점이 있다! //그래서 1대다 패치조인에서는 페이징 쓰면 안 된다
+            .getResultList();
 
+    }
 
 }

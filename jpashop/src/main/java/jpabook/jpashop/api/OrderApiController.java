@@ -36,7 +36,7 @@ public class OrderApiController {
         return all;
     }
 
-    @GetMapping("/api/v2/orders")
+    @GetMapping("/api/v2/orders") //엔티티 감싸줌
     public List<OrderDto> orderV2(){
 
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
@@ -49,6 +49,22 @@ public class OrderApiController {
 //        .map(OrderDto::new) //변환
 //        .collect(toList()); ->이렇게 까지 줄일 수도 잇음
     }
+
+    @GetMapping("/api/v3/orders") //패치조인으로 최적화
+    public List<OrderDto> orderV3(){
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        for (Order order : orders) {
+            System.out.println("order ref=" + order+ "id=" + order.getId());
+        }
+
+        List<OrderDto> result = orders.stream()
+                .map(o -> new OrderDto(o)) //변환
+                .collect(Collectors.toList());
+        return result;
+
+    }
+
 
     @Getter  //@Data를 써도 되고. no properties 에러는 보통 getter로 해결
     static class OrderDto {
