@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepositiory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
@@ -24,6 +26,7 @@ import static java.util.stream.Collectors.*;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepositiory orderQueryRepositiory;
 
     @GetMapping("/api/v1/orders") //entity 노출한 안 좋은 버전임
     public List<Order> orderV1(){
@@ -78,6 +81,11 @@ public class OrderApiController {
                 .collect(Collectors.toList());
         return result;
 
+    }
+
+    @GetMapping("/api/v4/orders") //패치조인으로 최적화
+    public List<OrderQueryDto> orderV4(){
+        return orderQueryRepositiory.findOrderQueryDtos();
     }
 
 
