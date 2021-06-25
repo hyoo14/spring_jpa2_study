@@ -1,14 +1,22 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
+import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +34,65 @@ public class OrderApiController {
             orderItems.stream().forEach(o->o.getItem().getName()); //강제로 데이터 뿌리게 해줌.
         }
         return all;
+    }
+
+    @GetMapping("/api/v2/orders")
+    public List<OrderDto> orderV2(){
+
+        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        List<OrderDto> result = orders.stream()
+                .map(o -> new OrderDto(o)) //변환
+                .collect(Collectors.toList());
+        return result;
+
+        //return orderRepository.findAllByString(new OrderSearch()).stream()
+//        .map(OrderDto::new) //변환
+//        .collect(toList()); ->이렇게 까지 줄일 수도 잇음
+    }
+
+    @Getter  //@Data를 써도 되고. no properties 에러는 보통 getter로 해결
+    static class OrderDto {
+
+        private Long orderId;
+        private String name;
+        private LocalDateTime orderDate;
+        private OrderStatus orderStatus;
+        private Address address; //벨류 오브젝트 같은 것은 엔티티서 노출해도 됨.
+        //private List<OrderItem> orderItems; //이거 엔티티 수정 들어가면 api 다 망가져버림. 그래서 아래처럼 바꿈
+        private List<OrderItemDto> orderItems;
+
+        public OrderDto(Order order){
+            orderId = order.getId();
+            name = order.getMember().getName();
+            orderDate  = order.getOrderDate();
+            orderStatus = order.getStatus();
+            address = order.getDelivery().getAddress();
+
+//            order.getOrderItems().stream().forEach(o->o.getItem().getName());//원래 이렇게 하면 안됨. orderItem도 다 dto로 바꾸어야함.
+//
+//            orderItems = order.getOrderItems();
+            orderItems = order.getOrderItems().stream()
+                    .map(orderItem -> new OrderItemDto(orderItem))
+                    .collect(toList());
+        }
+
+    }
+
+    @Getter
+    static class OrderItemDto{
+
+        private String itemName; //상품명
+        private int orderPrice; //주문 가격
+        private int count; //주문 수량
+
+        public OrderItemDto(OrderItem orderItem) {
+            itemName = orderItem.getItem().getName();
+            orderPrice = orderItem.getOrderPrice();
+            count = orderItem.getCount();
+        }
+
+
+
+
     }
 }
