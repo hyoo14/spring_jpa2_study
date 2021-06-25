@@ -3,6 +3,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,9 +25,10 @@ public class Order {
     @JoinColumn(name = "member_id")
     private Member member; //주문 회원
 
-    //23강서 설명 추가: 오더 퍼시스트하면 오더아이템도 다 강제로 퍼시스트 날려줌-캐스캐이드 걸려서
+    //@BatchSize(size = 1000) //jpa2-페이징한계돌파 : 컬렉션인 경우 여기서 배치사이즈 정해줌. // 사실 별 의미는 없고 application.yml에서 default_betch_fetch_size에 적는 것이 가장 나음
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL) //원래는 오더 저장하고 쭉쭉 저장해야하는데 //캐스케이드 올
     private List<OrderItem> orderItems = new ArrayList<>();
+    //23강서 설명 추가: 오더 퍼시스트하면 오더아이템도 다 강제로 퍼시스트 날려줌-캐스캐이드 걸려서
 
     //오더 아이템A,B,C jpa persist 해줘야하는데, 그담 poersisit(orrder) 이런 식
     //persist cascade가 전파해줌, 딜리트할 때 다 지워줌

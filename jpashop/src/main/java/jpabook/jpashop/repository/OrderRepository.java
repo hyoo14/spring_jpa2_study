@@ -105,6 +105,8 @@ public class OrderRepository {
 
 
 
+
+
 //    public List<OrderSimpleQueryDto> findOrderDtos() {
 //        return em.createQuery( "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) from Order o" +
 //                                    " join o.member m" +
@@ -121,8 +123,8 @@ public class OrderRepository {
                 "select distinct o from Order o" + //"select o from Order o"
                         " join fetch o.member m" + //이렇게 하니 컬럼 뻥튀기되서 넘 많아짐 그래서 대안으로 위에서 distinct 사용
                         // 하지만 dbquery상은 똑같음.. jpa에서 중복 버려준 것! 컬렉션 담을 때! (distinct는 2가지 기능 한 것. 쿼리에도 넣어주고, 어플차원서 중복도 제거해주고)
-                        " join fetch o.delivery d" +
-                        " join fetch o.orderItems oi" +
+                        " join fetch o.delivery d" + //여기까지는 한방쿼리 toOne이라서
+                        " join fetch o.orderItems oi" + //여기서부터는 toMany여서 한방안됨
                         " join fetch oi.item i", Order.class)
             .setFirstResult(1) //페이징예시
             .setMaxResults(100) //페이징예시 //지금 방법은 페이징이 안 되는 단점이 있다! //그래서 1대다 패치조인에서는 페이징 쓰면 안 된다
@@ -130,4 +132,14 @@ public class OrderRepository {
 
     }
 
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" + //패치는 jpa만 있는 문법. sql에는 없음 //jpa 기본편 참고
+                        " join fetch o.delivery d", Order.class )//패치 조인은 실무에서 정말 자주 사용. 책이나 강좌로 100퍼 이해해야함!
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+
+    }
 }
