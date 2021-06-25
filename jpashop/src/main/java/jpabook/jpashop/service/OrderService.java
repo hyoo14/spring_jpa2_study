@@ -29,7 +29,8 @@ public class OrderService {
     @Transactional
     public Long order(Long memberId, Long itemId, int count){
         //엔티티조회
-        Member member = memberRepository.findOne(memberId);
+        //Member member = memberRepository.findOne(memberId); //spring data jpa 적용 전
+        Member member = memberRepository.findById(memberId).get();
         Item item = itemRepository.findOne(itemId);
 
         //배송정보 생성

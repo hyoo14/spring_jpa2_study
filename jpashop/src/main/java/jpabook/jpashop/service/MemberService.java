@@ -40,6 +40,7 @@ public class MemberService {
     private void validateDuplicateMember(Member member){
         //Exception
         List<Member> findMembers  = memberRepository.findByName(member.getName());//데이터베이스에 네임 유니크 제약이 안전
+        //spring data jpa에서 findByName은 만들어줘야함
         if( !findMembers.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
@@ -51,12 +52,14 @@ public class MemberService {
     }
     //@Transactional(readOnly = true) //읽기에는 가급적이면 리드온리에 트루 넣어줘야.
     public Member findOne(Long memberId){//단건조회
-        return memberRepository.findOne(memberId);
+        //return memberRepository.findOne(memberId); //spring data jpa 쓰기 이전. MemberRepositoryOld 부분
+        return memberRepository.findById(memberId).get();//spring data jpa버전
     }
 
     @Transactional
     public void update(Long id, String name) {
-        Member member = memberRepository.findOne(id);
+        //Member member = memberRepository.findOne(id); //spring data jpa 쓰기 이전. MemberRepositoryOld 부분
+        Member member = memberRepository.findById(id).get();//spring data jpa버전
         member.setName(name);
     }
 }
