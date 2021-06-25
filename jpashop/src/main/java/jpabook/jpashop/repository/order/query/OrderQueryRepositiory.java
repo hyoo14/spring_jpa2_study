@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,6 +24,37 @@ public class OrderQueryRepositiory {
             o.setOrderItems(orderItems);
         });
         return result;
+    }
+
+    public List<OrderQueryDto> findAllByDto_optimization() {
+        List<OrderQueryDto> result = findOrders();
+
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = findOrderItemMap(toOrderIds(result)); //리펙토링으로 많이 합쳐놓고 많이 빼줌.
+
+        result.forEach(o->o.setOrderItems(orderItemMap.get(o.getOrderId())));
+        //앞에거는 포문에서 쿼리 계속 날렸는데 여기서는 쿼리는 한번만 날리고 다 가져온 다음에 메모리에서 매칭해가지고 값을 세팅(쿼리 2번만 나감)
+        return result;
+    }
+
+    private Map<Long, List<OrderItemQueryDto>> findOrderItemMap(List<Long> orderIds) {
+        List<OrderItemQueryDto> orderItems = em.createQuery(
+                "select new jpabook.jpashop.repository.order.query.OrderItemQueryDto(oi.order.id, i.name, oi.orderPrice, oi.count)" + //querydsl쓰면 이런 짓 안 해도 됨
+                        " from OrderItem oi" +
+                        " join oi.item i" +
+                        " where oi.order.id in :orderIds", OrderItemQueryDto.class)
+                .setParameter("orderIds", orderIds)
+                .getResultList();
+
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = orderItems.stream()
+                .collect(Collectors.groupingBy(orderItemQueryDto -> orderItemQueryDto.getOrderId()));
+        return orderItemMap;
+    }
+
+    private List<Long> toOrderIds(List<OrderQueryDto> result) {
+        List<Long> orderIds = result.stream()
+                .map(o -> o.getOrderId())
+                .collect(Collectors.toList());
+        return orderIds;
     }
 
     private List<OrderItemQueryDto> findOrderItems(Long orderId) {
@@ -41,4 +75,6 @@ public class OrderQueryRepositiory {
                         " join o.delivery d", OrderQueryDto.class)
                 .getResultList();
     }
+
+
 }

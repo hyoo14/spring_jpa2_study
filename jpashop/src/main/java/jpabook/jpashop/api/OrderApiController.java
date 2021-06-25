@@ -88,6 +88,11 @@ public class OrderApiController {
         return orderQueryRepositiory.findOrderQueryDtos();
     }
 
+    @GetMapping("/api/v5/orders") //패치조인으로 최적화
+    public List<OrderQueryDto> orderV5(){
+        return orderQueryRepositiory.findAllByDto_optimization();
+    }
+
 
     @Getter  //@Data를 써도 되고. no properties 에러는 보통 getter로 해결
     static class OrderDto {
