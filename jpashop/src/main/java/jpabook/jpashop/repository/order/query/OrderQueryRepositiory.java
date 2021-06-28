@@ -87,5 +87,5 @@ public class OrderQueryRepositiory {
                         " join oi.item i", OrderFlatDto.class)
                 .getResultList();
 
-    }
+    }//
 }
