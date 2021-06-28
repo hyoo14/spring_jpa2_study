@@ -23,13 +23,14 @@ import static jpabook.jpashop.domain.QOrder.*;
 @RequiredArgsConstructor
 public class OrderRepository {
 
-    private final EntityManager em;
-    private final JPAQueryFactory query;
 
-    public OrderRepository(EntityManager em) {
-        this.em = em;
-        this.query = new JPAQueryFactory(em);
-    }
+    private final EntityManager em;
+    //private final JPAQueryFactory query;
+
+//    public OrderRepository(EntityManager em) {
+//        this.em = em;
+//        this.query = new JPAQueryFactory(em);
+//    }
 
     public void  save(Order order){
         em.persist(order);
@@ -106,7 +107,7 @@ public class OrderRepository {
         return query.getResultList();
     }
     public List<Order> findAll(OrderSearch orderSearch){
-        //JPAQueryFactory query = new JPAQueryFactory(em); //예도 줄일 수 있음-컨스트럭터 위에서 만듬
+        JPAQueryFactory query = new JPAQueryFactory(em); //예도 줄일 수 있음-컨스트럭터 위에서 만듬 //근데 안 됨..이유는 모르겠ㅇㅁ..
         //QOrder order = QOrder.order; //다 없애고 static import 됨
         //QMember member = QMember.member; //위와 마찮가지
 
