@@ -78,6 +78,7 @@ public class OrderService {
 
     //검색
     public List<Order> findOrders(OrderSearch orderSearch){
-        return orderRepository.findAllByString(orderSearch);
+        return orderRepository.findAll(orderSearch);
+        //return orderRepository.findAllByString(orderSearch);//querydsl사용 전.
     } //단순 조회면 리포짓토리 그냥 호출 하는 편.. //여기서는 코드 얼마 없고 하니 서비스에 위임함
 }

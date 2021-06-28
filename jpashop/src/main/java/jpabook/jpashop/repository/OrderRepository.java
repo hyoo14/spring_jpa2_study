@@ -2,7 +2,9 @@ package jpabook.jpashop.repository;
 
 //import jpabook.jpashop.api.OrderSimpleApiController; //리포지토리에서 컨트롤러에 의존관계 생기면 큰일납니다. //망하자는 거(강조하심)
 //의존관계는 안으로 들어오거나 헥사고널 아키텍처처럼 다 인터페이스로 발라내거나 이런 거 아닌 이상 한방향으로 흘러가야함(컨트롤러에서 리포지토리 가는 거 정도)
-import jpabook.jpashop.domain.Member;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,11 +16,20 @@ import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jpabook.jpashop.domain.QMember.member;
+import static jpabook.jpashop.domain.QOrder.*;
+
 @Repository
 @RequiredArgsConstructor
 public class OrderRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory query;
+
+    public OrderRepository(EntityManager em) {
+        this.em = em;
+        this.query = new JPAQueryFactory(em);
+    }
 
     public void  save(Order order){
         em.persist(order);
@@ -93,6 +104,34 @@ public class OrderRepository {
         cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
         return query.getResultList();
+    }
+    public List<Order> findAll(OrderSearch orderSearch){
+        //JPAQueryFactory query = new JPAQueryFactory(em); //예도 줄일 수 있음-컨스트럭터 위에서 만듬
+        //QOrder order = QOrder.order; //다 없애고 static import 됨
+        //QMember member = QMember.member; //위와 마찮가지
+
+        return query.select(order)
+                .from(order)
+                .join(order.member, member) //static import 해줌 QOrder, QMember
+                .where(statusEq(orderSearch.getOrderStatus()), nameLike(orderSearch.getMemberName())) //where(order.status.eq(orderSearch.getOrderStatus())) 정적으로 이렇게 해도 됨
+                .limit(1000)
+                .fetch();
+    } //이게 jpql이랑 똑같음. 진짜 큰 장점: 오타를 내면 자바코드니까 다 잡힘.(컴파일 시점에) 어마어마한 장점.
+    //다 없애주면 이렇게 코드가 나옴! 기가 막힘
+
+    private BooleanExpression nameLike(String memberName) {
+        if(StringUtils.hasText(memberName)){
+            return null;
+        }
+        return member.name.like(memberName);
+    }
+
+    private BooleanExpression statusEq(OrderStatus statusCond){
+        if (statusCond == null){
+            return null;
+
+        }
+        return order.status.eq(statusCond);
     }
 
     public List<Order> findAllWithMemberDelivery() { //한방 쿼리로 멤버 오더 딜리버리 조인한 다음 아예 셀렉 절에 다 넣고 한방에 다 땡겨옴
